@@ -1,0 +1,62 @@
+# Reusable workflow invoked by the dist-generated release.yml (see
+# publish-jobs = ["./publish-app"] in dist-workspace.toml). dist owns the CLI
+# artifacts; this job owns the residual app step: build OpenWith.app and
+# OpenWithPane.prefPane, sign, package, upload onto the same GitHub Release,
+# and update the Homebrew cask.
+#
+# dist regenerates release.yml; this file is authored by hand and stable.
+name: publish-app
+
+on:
+  workflow_call:
+    inputs:
+      plan:
+        required: true
+        type: string
+
+jobs:
+  package-app:
+    name: Package OpenWith.app + PrefPane
+    runs-on: macos-26
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PLAN: ${{ inputs.plan }}
+      # Empty until an Apple Developer account exists; the notarize step
+      # skips cleanly while it is.
+      APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+      HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check whether the GUI exists yet
+        id: gate
+        run: |
+          if [[ -d Apps ]]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "Apps/ not present; skipping app packaging."
+          fi
+
+      - name: Build, sign and package (ad-hoc unless SIGN_IDENTITY is set)
+        if: steps.gate.outputs.present == 'true'
+        env:
+          SIGN_IDENTITY: ${{ secrets.SIGN_IDENTITY }}
+        run: scripts/package-app.sh dist
+
+      - name: Notarize (turns on when Developer ID secrets exist)
+        if: steps.gate.outputs.present == 'true' && env.APPLE_API_KEY != ''
+        env:
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+        run: scripts/notarize.sh dist
+
+      - name: Upload onto the dist-created release
+        if: steps.gate.outputs.present == 'true'
+        run: |
+          tag=$(jq -r '.announcement_tag' <<< "$PLAN")
+          gh release upload "$tag" dist/OpenWith-* --clobber
+
+      - name: Update the Homebrew cask
+        if: steps.gate.outputs.present == 'true' && env.HOMEBREW_TAP_TOKEN != ''
+        run: scripts/update-cask.sh dist

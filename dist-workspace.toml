@@ -1,0 +1,41 @@
+[workspace]
+members = ["dist:."]
+
+# dist (cargo-dist) generic-project manifest.
+# Single source of truth for the version: the release tag must equal it,
+# and Sources/OpenWithCore/Model.swift must agree (CI enforces both).
+# After editing [dist], re-run 'dist init --yes' and preview with 'dist plan'.
+[package]
+name = "openwith"
+version = "0.1.0"
+description = "Manage macOS default applications for file types, extensions and URL schemes"
+repository = "https://github.com/jmarette/openwith"
+homepage = "https://github.com/jmarette/openwith"
+license = "MIT OR Apache-2.0"
+binaries = ["openwith"]
+build-command = ["scripts/build-universal.sh"]
+
+# Config for 'dist'
+[dist]
+# The preferred dist version to use in CI (Cargo.toml SemVer syntax)
+cargo-dist-version = "0.32.0"
+# CI backends to support
+ci = "github"
+# The installers to generate for each app
+installers = ["shell", "homebrew"]
+# A GitHub repo to push Homebrew formulas to
+tap = "jmarette/homebrew-tap"
+# Publish jobs to run in CI
+publish-jobs = ["homebrew", "./publish-app"]
+# Target platforms to build apps for (Rust target-triple syntax)
+targets = ["aarch64-apple-darwin", "x86_64-apple-darwin"]
+# Path that installers should place binaries in
+install-path = "~/.local/bin"
+# Whether to install an updater program
+install-updater = false
+
+# Both slices are cross-compiled into one universal binary; build them on
+# arm64 runners with a current Xcode (Swift 6 + macOS 26 SDK).
+[dist.github-custom-runners]
+aarch64-apple-darwin = "macos-26"
+x86_64-apple-darwin = "macos-26"

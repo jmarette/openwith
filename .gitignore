@@ -3,7 +3,10 @@
 /.swiftpm
 /dist
 /build
+# The universal binary that scripts/build-universal.sh stages for dist.
+/openwith
 DerivedData/
 xcuserdata/
 *.xcscmblueprint
 *.xccheckout
+/target
