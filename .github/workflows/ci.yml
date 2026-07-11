@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  test:
+    name: Build & test (macOS)
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check formatting
+        run: swift format lint --strict --recursive Package.swift Sources Tests
+
+      - name: Check version consistency
+        run: scripts/check-version.sh
+
+      - name: Build
+        run: swift build
+
+      - name: Test
+        run: swift test
