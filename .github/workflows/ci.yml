@@ -23,3 +23,13 @@ jobs:
 
       - name: Test
         run: swift test
+
+      - name: Build OpenWith.app (compile-only smoke test)
+        run: |
+          xcodebuild -project Apps/OpenWith.xcodeproj -scheme OpenWithApp \
+            -configuration Release CODE_SIGNING_ALLOWED=NO -quiet build
+
+      - name: Build OpenWithPane.prefPane (compile-only smoke test)
+        run: |
+          xcodebuild -project Apps/OpenWith.xcodeproj -scheme OpenWithPane \
+            -configuration Release CODE_SIGNING_ALLOWED=NO -quiet build

@@ -1,0 +1,86 @@
+# XcodeGen spec for the GUI app and the PrefPane. SwiftPM alone cannot emit
+# a .app with an Info.plist or a .prefPane bundle, so these two thin shells
+# live in an Xcode project that consumes the local package (all logic stays
+# in OpenWithCore/OpenWithUI).
+#
+# Regenerate after editing:  xcodegen generate --spec Apps/project.yml
+# The generated OpenWith.xcodeproj is committed so CI does not need xcodegen.
+name: OpenWith
+options:
+  bundleIdPrefix: com.jmarette
+  deploymentTarget:
+    macOS: "15.0"
+  groupSortPosition: top
+
+packages:
+  openwith:
+    path: ..
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    CODE_SIGN_IDENTITY: "-"
+    CODE_SIGN_STYLE: Manual
+    DEVELOPMENT_TEAM: ""
+
+targets:
+  OpenWithApp:
+    type: application
+    platform: macOS
+    sources: [OpenWithApp]
+    dependencies:
+      - package: openwith
+        product: OpenWithUI
+      - package: openwith
+        product: OpenWithCore
+    settings:
+      base:
+        PRODUCT_NAME: OpenWith
+        PRODUCT_BUNDLE_IDENTIFIER: com.jmarette.openwith
+        ENABLE_HARDENED_RUNTIME: YES
+    info:
+      path: OpenWithApp/Info.plist
+      properties:
+        CFBundleName: OpenWith
+        CFBundleDisplayName: OpenWith
+        CFBundleShortVersionString: "0.1.0"
+        CFBundleVersion: "1"
+        LSMinimumSystemVersion: "15.0"
+        LSApplicationCategoryType: public.app-category.utilities
+        NSHumanReadableCopyright: "© 2026 Jonathan Marette — MIT OR Apache-2.0"
+
+  OpenWithPane:
+    type: bundle
+    platform: macOS
+    sources: [OpenWithPane]
+    dependencies:
+      - package: openwith
+        product: OpenWithUI
+      - package: openwith
+        product: OpenWithCore
+      - sdk: PreferencePanes.framework
+    settings:
+      base:
+        PRODUCT_NAME: OpenWithPane
+        PRODUCT_BUNDLE_IDENTIFIER: com.jmarette.openwith.pane
+        WRAPPER_EXTENSION: prefPane
+    info:
+      path: OpenWithPane/Info.plist
+      properties:
+        CFBundleName: OpenWith
+        CFBundleShortVersionString: "0.1.0"
+        CFBundleVersion: "1"
+        NSPrincipalClass: OpenWithPreferencePane
+        NSPrefPaneIconLabel: OpenWith
+        LSMinimumSystemVersion: "15.0"
+        NSHumanReadableCopyright: "© 2026 Jonathan Marette — MIT OR Apache-2.0"
+
+schemes:
+  OpenWithApp:
+    build:
+      targets:
+        OpenWithApp: all
+  OpenWithPane:
+    build:
+      targets:
+        OpenWithPane: all

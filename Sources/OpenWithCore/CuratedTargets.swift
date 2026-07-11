@@ -12,6 +12,8 @@ public struct CuratedTarget: Sendable, Hashable {
     case video
     case archives
     case urlSchemes
+    /// Found by scanning installed apps' declared types (see `Discovery`).
+    case discovered
   }
 
   public var target: Target
