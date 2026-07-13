@@ -39,3 +39,8 @@ install-updater = false
 [dist.github-custom-runners]
 aarch64-apple-darwin = "macos-26"
 x86_64-apple-darwin = "macos-26"
+
+# The publish-app job uploads the dmg/pane zip onto the release, so it needs
+# contents: write (dist's default for custom jobs is id-token + packages only).
+[dist.github-custom-job-permissions]
+publish-app = { contents = "write" }
