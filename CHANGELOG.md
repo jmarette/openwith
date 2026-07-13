@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `openwith-pane` Homebrew cask: `brew install --cask jmarette/tap/openwith-pane`
+  installs the System Settings pane into `~/Library/PreferencePanes` (it was
+  previously a manual unzip). The release pipeline now updates both casks.
+
 ## [0.1.0] - 2026-07-13
 
 ### Added

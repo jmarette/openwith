@@ -40,16 +40,16 @@ Two things follow from how macOS works, and no tool can bypass them:
 ## Install
 
 ```console
-brew install jmarette/tap/openwith            # CLI
-brew install --cask jmarette/tap/openwith-app # GUI (unsigned: see caveats)
+brew install jmarette/tap/openwith             # CLI
+brew install --cask jmarette/tap/openwith-app  # GUI (unsigned: see caveats)
+brew install --cask jmarette/tap/openwith-pane # System Settings pane (optional)
 ```
 
 Or grab a tarball / the shell installer from the
-[releases page](https://github.com/jmarette/openwith/releases).
-
-The PrefPane ships as `OpenWith-Pane-<version>.zip` on each release: unzip
-and move `OpenWithPane.prefPane` to `~/Library/PreferencePanes/`, then open
-System Settings — it appears at the bottom of the sidebar.
+[releases page](https://github.com/jmarette/openwith/releases); the PrefPane
+also ships there as `OpenWith-Pane-<version>.zip` (unzip into
+`~/Library/PreferencePanes/`). It appears at the bottom of the System
+Settings sidebar.
 
 ## Commands
 
@@ -162,7 +162,8 @@ $ openwith get md --json
 ```console
 brew uninstall openwith
 brew uninstall --cask openwith-app
-rm -rf ~/Library/PreferencePanes/OpenWithPane.prefPane   # if installed
+brew uninstall --cask openwith-pane                      # or, if manual:
+rm -rf ~/Library/PreferencePanes/OpenWithPane.prefPane
 ```
 
 `openwith` stores nothing outside LaunchServices; removing the tool leaves
